@@ -34,10 +34,24 @@ export default function Dashboard() {
     }, [])
 
     const addBookmark = async () => {
+        if (!title || !url) return
+
         const {
             data: { user },
         } = await supabase.auth.getUser()
 
+        const newBookmark = {
+            id: crypto.randomUUID(), // temporary ID
+            title,
+            url,
+            user_id: user.id,
+            created_at: new Date().toISOString(),
+        }
+
+        // 🔥 INSTANT UI UPDATE
+        setBookmarks((prev) => [newBookmark, ...prev])
+
+        // Save to DB
         await supabase.from('bookmarks').insert({
             title,
             url,
